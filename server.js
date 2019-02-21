@@ -1,77 +1,84 @@
 const express = require("express");
 const logger = require("morgan");
-const mongoose = require("mongoose");
+// const mongoose = require("mongoose");
+// const mongojs = require("mongojs");
+// const cheerio = require("cheerio");
+// const axios = require("axios");
+const exphbs = require("express-handlebars");
 
-
-const cheerio = require("cheerio");
-const axios = require("axios");
-
-const db = require("./models");
-
-const PORT = 3000;
+// const db = require("./models");
+const PORT = process.env.PORT || 3000;
 
 const app = express();
 
+require("./routes/apiroutes.js")(app)
+
+app.engine("handlebars", exphbs({ defaultLayout: "main" }));
+app.set("view engine", "handlebars");
+
 app.use(logger("dev"));
-app.use(express.urlencoded({ extended: true}));
+app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 app.use(express.static("public"));
 
-var MONGODB_URI = process.env.MONGODB_URI || "mongodb://localhost/mongoHeadlines";
+// var MONGODB_URI = process.env.MONGODB_URI || "mongodb://localhost/mongoHeadlines";
 
-mongoose.connect(MONGODB_URI);
+// mongoose.connect(MONGODB_URI);
 
-app.get("/scrape", function (req, res) {
-axios.get("https://www.npr.org/sections/news/").then(function(response) {
-    const $ = cheerio.load(response.data);
+// Database configuration
+// var databaseUrl = "scrapers";
+// var collections = ["scraped"];
+
+// // Hook mongojs configuration to the db variable
+// var db = mongojs(databaseUrl, collections);
+
+// db.on("error", function (error) {
+//     console.log("Database Error:", error);
+// });
+
+app.get("/", function(req, res) {
+    res.send();
+  });
+
+// app.get("/scrape", function (req, res) {
+//     axios.get("https://www.npr.org/sections/news/").then(function (response) {
+//         const $ = cheerio.load(response.data);
+
+//         $("article").each(function (i, element) {
     
-    $("article").each(function(i, element) {
-        let results = [];
+//             let data = {
+//                 title: $(element).children("div.item-info-wrap").children('div.item-info').children("h2.title").text(),
+//                 link: $(element).children("div.item-info-wrap").children('div.item-info').children("p.teaser").children("a").attr("href"),
+//                 summary: $(element).children("div.item-info-wrap").children('div.item-info').children("p.teaser").children("a").text(),
+//                 pic: $(element).children('div.item-image').children("div.imagewrap").children("a").children("img").attr("src")
+//             }
+//        console.log(data)
+//                 db.scraped.insert(data)
+                
+//         })
+//     });
+// });
 
-        let title = $(element).children("div.item-info-wrap").children('div.item-info').children("h2.title").text();
-        let link = $(element).children("div.item-info-wrap").children('div.item-info').children("p.teaser").children("a").attr("href");
-        let summary = $(element).children("div.item-info-wrap").children('div.item-info').children("p.teaser").children("a").text();
-        let pic = $(element).children('div.item-image').children("div.imagewrap").children("a").children("img").attr("src");
+// app.get("/all", function (req, res) {
+//     // Query: In our database, go to the animals collection, then "find" everything
+//     db.scraped.find({}, function (err, found) {
+//         // Log any errors if the server encounters one
+//         if (err) {
+//             console.log(err);
+//         }
+//         // Otherwise, send the result of this query to the browser
+//         else {
+//             res.json(found);
+//         }
+//     });
+// });
 
-        db.Article.create(results)
-        .then(function(dbArticle) {
-            console.log(dbArticle);
-        })
-        .catch(function(err) {
-            console.log(err);
-        });
-        results.push({
-            title: title,
-            link: link,
-            summary: summary,
-            pic: pic,
-          });
 
-    })
-console.log(results);
-res.send("Scrape Complete")
-});
-});
-
-app.get("/articles", function(req, res){
-
-    //finish the route so it grabs all of the articles
-});
-
-app.get("/articles/:id", function(req, res){
-     // Finish the route so it finds one article using the req.params.id,
-  // and run the populate method with "note",
-  // then responds with the article with the note included
-});
-
-app.post("/articles/:id", function(req, res) {
- // save the new note that gets posted to the Notes collection
-  // then find an article from the req.params.id
-  // and update it's "note" property with the _id of the new note
-
-});
-
-app.listen(PORT, function() {
+app.listen(PORT, function () {
     console.log("App running on port " + PORT + "!");
 });
 
+
+
+//look at folder 13 for ajax and appending json data
+//
